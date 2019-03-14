@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://use.fontawesome.com/releases/v5.7.2/css/all.css');
+@import url('https://cdn.jsdelivr.net/npm/leaflet@1.4.0/dist/leaflet.css');
+@import url('https://cdn.jsdelivr.net/npm/leaflet-extra-markers@1.1.0/dist/css/leaflet.extra-markers.min.css');
+@import '~bulma/bulma';
+@import '~bulma-helpers/bulma-helpers';
+
+#ryzommap {
+  height: calc(100vh - (10px + 36px + 10px + 5px) - 5px);
+}
+
+/* Change mouse position tooltip */
+.leaflet-control-mouseposition {
+  display: none;
+}
+
+.leaflet-grab {
+  cursor: auto;
+}
+
+.leaflet-dragging .leaflet-grab {
+  cursor: move;
+}
