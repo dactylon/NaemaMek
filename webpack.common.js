@@ -3,18 +3,18 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-// eslint-disable-next-line no-unused-vars
-module.exports = env => {
+module.exports = production => {
   return {
     entry: {
-      app: './src/app.js',
+      app: ['./src/app.js', './src/app.scss'],
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: '[name].js',
+      filename: production ? '[name].[contenthash].js' : '[name].js',
       publicPath: '/',
     },
     resolve: {
+      extensions: ['.js', '.scss'],
       alias: {
         vendor: path.resolve(__dirname, 'src/vendor'),
       },
@@ -24,11 +24,12 @@ module.exports = env => {
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: 'src/index.pug',
-        inject: false,
-        hash: false,
+        inject: true,
+        hash: production,
       }),
       new MiniCssExtractPlugin({
-        filename: '[name].css',
+        filename: production ? '[name].[contenthash].css' : '[name].css',
+        chunkFilename: production ? '[id].[contenthash].css' : '[id].css',
       }),
     ],
     module: {
@@ -56,20 +57,18 @@ module.exports = env => {
           },
         },
         {
-          test: /\.css$/,
-          use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader'],
-        },
-        {
-          test: /\.scss$/,
+          test: /\.(sa|sc|c)ss$/,
           use: [
-            'style-loader',
-            MiniCssExtractPlugin.loader,
+            {
+              loader: production ? MiniCssExtractPlugin.loader : 'style-loader',
+            },
             'css-loader',
             'postcss-loader',
             {
               loader: 'sass-loader',
               options: {
                 includePaths: [path.resolve(__dirname, 'node_modules')],
+                sourceMap: !production,
               },
             },
           ],
