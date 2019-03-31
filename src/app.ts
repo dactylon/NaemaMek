@@ -1,22 +1,34 @@
-import L from 'leaflet';
+import 'leaflet';
 import 'leaflet-extra-markers';
-import 'vendor/ryzom/map.js';
+import { Ryzom } from 'vendor/ryzom/map';
 
 import './app.scss';
 
-var Ryzom = window.Ryzom;
+declare const L: any;
 
-var southWest = L.latLng(107648, -16656);
-var northEast = L.latLng(122320, 96);
-var bounds = L.latLngBounds(southWest, northEast);
-var zoom = 6;
-var map = null;
-var markers = null;
+interface IPet {
+  index: number;
+  stable: string;
+  status: string;
+  satiety: number;
+  x: number;
+  y: number;
+  z: number;
+}
+
+const southWest: L.LatLng = L.latLng(107648, -16656);
+const northEast: L.LatLng = L.latLng(122320, 96);
+const bounds: L.LatLngBounds = L.latLngBounds(southWest, northEast);
+const zoom: number = 6;
+var map: any = null;
+var markers: any = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
 
-  var findButton = document.getElementById('findbutton');
+  const findButton: HTMLElement = <HTMLElement>(
+    document.getElementById('findbutton')
+  );
   findButton.addEventListener('click', findMyPets);
 });
 
@@ -53,43 +65,29 @@ function initMap() {
 }
 
 function findMyPets() {
-  var key = document.getElementById('charkey').value;
-  if (key == '') {
+  var key: string = (document.getElementById('charkey') as HTMLInputElement)
+    .value;
+  if (!key) {
     return;
   }
   getPetsPosition(key);
 }
 
-function getPetsPosition(charKey) {
+function getPetsPosition(charKey: string): void {
   let xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      let parseXml;
-      if (typeof window.DOMParser != 'undefined') {
-        parseXml = xmlStr => {
-          return new window.DOMParser().parseFromString(xmlStr, 'text/xml');
-        };
-      } else if (
-        typeof window.ActiveXObject != 'undefined' &&
-        new window.ActiveXObject('Microsoft.XMLDOM')
-      ) {
-        parseXml = xmlStr => {
-          var xmlDoc = new window.ActiveXObject('Microsoft.XMLDOM');
-          xmlDoc.async = false;
-          xmlDoc.loadXML(xmlStr);
-          return xmlDoc;
-        };
-      } else {
-        throw new Error('No XML parser found');
-      }
+      let parseXml = xmlStr => {
+        return new DOMParser().parseFromString(xmlStr, 'text/xml');
+      };
 
       let xmlDoc = parseXml(this.responseText);
       let animals = xmlDoc.getElementsByTagName('animal');
 
-      var pets = [];
+      var pets: Array<IPet> = [];
       Array.prototype.forEach.call(animals, animal => {
         // Pet index
-        let index = parseInt(animal.getAttribute('index'));
+        let index: number = parseInt(animal.getAttribute('index'));
 
         // Get stable status
         let stableStatus = animal.getElementsByTagName('status')[0];
@@ -103,9 +101,9 @@ function getPetsPosition(charKey) {
 
         // Get position of each animal
         let position = animal.getElementsByTagName('position')[0];
-        let x = parseInt(position.getAttribute('x'));
-        let y = parseInt(position.getAttribute('y'));
-        let z = parseInt(position.getAttribute('z'));
+        let x: number = parseInt(position.getAttribute('x'));
+        let y: number = parseInt(position.getAttribute('y'));
+        let z: number = parseInt(position.getAttribute('z'));
 
         pets.push({
           index: index,
@@ -124,22 +122,22 @@ function getPetsPosition(charKey) {
   xmlhttp.send();
 }
 
-function drawMarkers(pets) {
+function drawMarkers(pets: Array<IPet>): void {
   markers.clearLayers();
 
-  for (var i in pets) {
-    var animal = pets[i];
+  for (const i in pets) {
+    const animal = pets[i];
 
-    var numMarker = L.ExtraMarkers.icon({
+    const numMarker = L.ExtraMarkers.icon({
       icon: 'fa-number',
       number: animal.index + 1,
       shape: 'star',
       markerColor: 'cyan',
     });
 
-    var info = '<div><b>Mektoub: ' + (animal.index + 1) + '</b></div>';
+    const info = '<div><b>Mektoub: ' + (animal.index + 1) + '</b></div>';
 
-    var marker = L.marker([animal.x, animal.y], {
+    const marker = L.marker([animal.x, animal.y], {
       icon: numMarker,
       title: animal.index,
     });

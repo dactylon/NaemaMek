@@ -2,11 +2,16 @@ const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+
+const srcDir = path.join(__dirname, 'src');
+const nodeModulesDir = path.join(__dirname, 'node_modules');
+const tsconfigFile = path.join(__dirname, 'tsconfig.json');
 
 module.exports = production => {
   return {
     entry: {
-      app: ['./src/app.js', './src/app.scss'],
+      app: ['./src/app.ts', './src/app.scss'],
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
@@ -14,10 +19,16 @@ module.exports = production => {
       publicPath: '/',
     },
     resolve: {
-      extensions: ['.js', '.scss'],
+      extensions: ['.ts', '.js', '.scss'],
+      modules: [srcDir, nodeModulesDir],
       alias: {
         vendor: path.resolve(__dirname, 'src/vendor'),
       },
+      plugins: [
+        new TsconfigPathsPlugin({
+          configFile: tsconfigFile,
+        }),
+      ],
     },
     plugins: [
       new CleanWebpackPlugin(),
@@ -36,25 +47,13 @@ module.exports = production => {
       rules: [
         {
           test: /\.pug$/,
-          exclude: ['/node_modules/'],
-          use: ['pug-loader'],
+          exclude: /node_modules/,
+          use: 'pug-loader',
         },
         {
-          test: /\.js$/,
-          exclude: ['/node_modules/'],
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                [
-                  '@babel/preset-env',
-                  {
-                    modules: false,
-                  },
-                ],
-              ],
-            },
-          },
+          test: [/\.js$/, /\.ts$/],
+          exclude: /node_modules/,
+          use: 'babel-loader',
         },
         {
           test: /\.(sa|sc|c)ss$/,
