@@ -13,14 +13,12 @@ module.exports = {
     jest: true,
   },
   extends: [
-    'airbnb-typescript',
     'plugin:@typescript-eslint/recommended',
     'plugin:eslint-comments/recommended',
     'plugin:jest/recommended',
     'plugin:promise/recommended',
     'plugin:unicorn/recommended',
     'prettier',
-    'prettier/react',
     'prettier/@typescript-eslint',
   ],
   rules: {
@@ -32,4 +30,18 @@ module.exports = {
     semi: ['error', 'always'],
     'global-require': 'error',
   },
+  overrides: [
+    {
+      files: ['*.js'],
+      rules: {
+        'typescript/no-var-requires': 'off',
+        'unicorn/prevent-abbreviations': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
+        'import/no-default-export': 'off',
+        '@typescript-eslint/camelcase': 'off',
+        'unicorn/prefer-exponentiation-operator', 'off'
+        'unicorn/no-zero-fractions', 'off'
+      },
+    },
+  ],
 };
